@@ -3,193 +3,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hadoop 3.4.1 Installation Guide</title>
+    <title>Installing Hadoop on Ubuntu</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             line-height: 1.6;
-            margin: 20px;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 800px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2 {
             color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            padding-top: 25px; /* Add padding for the fixed progress bar */
         }
-        pre {
-            background: #eee;
-            padding: 10px;
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 30px 0 15px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 15px;
+            margin: 15px 0;
             border-radius: 5px;
             position: relative;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre;
         }
+        
         .copy-btn {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 5px 10px;
+            top: 5px;
+            right: 5px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 3px 8px;
+            font-size: 12px;
             cursor: pointer;
-            border-radius: 5px;
+            opacity: 0.7;
         }
+        
         .copy-btn:hover {
-            background: #0056b3;
+            opacity: 1;
         }
-        .step {
-            margin-bottom: 20px;
+        
+        .blue {
+            color: #0066cc;
         }
+        
+        .variable {
+            color: #0066cc;
+        }
+        
+        .xml-tag {
+            color: #881280;
+        }
+        
+        .xml-attr {
+            color: #994500;
+        }
+        
+        .xml-value {
+            color: #1a1aa6;
+        }
+        
         .progress-container {
-            width: 100%;
-            background-color: #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background-color: #f5f5f5;
+            z-index: 1000;
         }
+        
         .progress-bar {
-            height: 20px;
+            height: 100%;
+            background-color: #0066cc;
             width: 0%;
-            background-color: #4caf50;
-            text-align: center;
-            color: white;
-            line-height: 20px;
-            border-radius: 5px;
+            transition: width 0.3s;
         }
-        .done {
-            background-color: #28a745 !important;
+        
+        @media (max-width: 820px) {
+            .progress-container {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h1>Hadoop 3.4.1 Installation Guide (Ubuntu)</h1>
-    
-    <!-- Progress Bar -->
     <div class="progress-container">
-        <div class="progress-bar" id="progress-bar">0%</div>
+        <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <div class="step">
-        <h2>Step 1: Install Java JDK 8</h2>
-        <p>Hadoop requires Java to run.</p>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            sudo apt install openjdk-8-jdk
-        </pre>
+    <h1>Installing Hadoop on Ubuntu</h1>
+
+    <h2>Step 1: Install Java JDK 8</h2>
+    <p>Hadoop requires Java to run. Install OpenJDK 8 using:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo apt install openjdk-8-jdk
     </div>
 
-    <div class="step">
-        <h2>Step 2: Set Up Environment Variables</h2>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            nano ~/.bashrc
-        </pre>
-        <p>Add these lines at the end of the file:</p>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-            export HADOOP_HOME=~/hadoop-3.4.1/
-            export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
-        </pre>
-        <p>Then, apply the changes:</p>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            source ~/.bashrc
-        </pre>
+    <p>To verify the installation:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+cd /usr/lib/jvm
     </div>
 
-    <div class="step">
-        <h2>Step 3: Download and Extract Hadoop</h2>
-        <p>Download Hadoop 3.4.1 from the <a href="https://hadoop.apache.org">official site</a>.</p>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            tar -zxvf ~/Downloads/hadoop-3.4.1.tar.gz
-        </pre>
+    <h2>Step 2: Configure Environment Variables</h2>
+    <p>Edit the <code>.bashrc</code> file to set up Java and Hadoop paths:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+nano ~/.bashrc
     </div>
 
-    <div class="step">
-        <h2>Step 4: Configure Hadoop</h2>
-        <p>Edit `hadoop-env.sh`:</p>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            sudo nano hadoop-3.4.1/etc/hadoop/hadoop-env.sh
-        </pre>
-        <p>Set JAVA_HOME:</p>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-        </pre>
+    <p>Add the following lines at the end:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="blue">export</span> JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+<span class="blue">export</span> PATH=<span class="variable">$PATH</span>:/usr/lib/jvm/java-8-openjdk-amd64/bin
+<span class="blue">export</span> HADOOP_HOME=~/hadoop-3.4.1/
+<span class="blue">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$HADOOP_HOME</span>/bin
+<span class="blue">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$HADOOP_HOME</span>/sbin
+<span class="blue">export</span> HADOOP_MAPRED_HOME=<span class="variable">$HADOOP_HOME</span>
+<span class="blue">export</span> YARN_HOME=<span class="variable">$HADOOP_HOME</span>
+<span class="blue">export</span> HADOOP_CONF_DIR=<span class="variable">$HADOOP_HOME</span>/etc/hadoop
+<span class="blue">export</span> HADOOP_COMMON_LIB_NATIVE_DIR=<span class="variable">$HADOOP_HOME</span>/lib/native
+<span class="blue">export</span> HADOOP_OPTS="-Djava.library.path=<span class="variable">$HADOOP_HOME</span>/lib/native"
+<span class="blue">export</span> HADOOP_STREAMING=<span class="variable">$HADOOP_HOME</span>/share/hadoop/tools/lib/hadoop-streaming-3.4.1.jar
+<span class="blue">export</span> HADOOP_LOG_DIR=<span class="variable">$HADOOP_HOME</span>/logs
+<span class="blue">export</span> PDSH_RCMD_TYPE=ssh
     </div>
 
-    <div class="step">
-        <h2>Step 5: Set Up SSH</h2>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
-        </pre>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-        </pre>
+    <p>Apply the changes:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+source ~/.bashrc
     </div>
 
-    <div class="step">
-        <h2>Step 6: Start Hadoop</h2>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            start-all.sh
-        </pre>
+    <p>Install SSH if not already installed:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo apt-get install ssh
     </div>
 
-    <div class="step">
-        <h2>Step 7: Run a WordCount Example</h2>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            hadoop jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.1.jar wordcount /input /output
-        </pre>
-        <p>View the results:</p>
-        <pre>
-            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
-            hadoop fs -cat /output/part-r-00000
-        </pre>
+    <h2>Step 3: Download and Extract Hadoop 3.4.1</h2>
+    <p>Download Hadoop from <a href="https://hadoop.apache.org" target="_blank">hadoop.apache.org</a> and extract it:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+tar -zxvf ~/Downloads/hadoop-3.4.1.tar.gz
     </div>
 
-</div>
+    <p>Navigate to the Hadoop configuration directory:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+cd hadoop-3.4.1/etc/hadoop
+    </div>
 
-<script>
-    function copyCommand(button) {
-        const pre = button.parentElement;
-        const command = pre.textContent.replace("Copy", "").trim();
-        navigator.clipboard.writeText(command);
-        button.textContent = "Copied!";
-        setTimeout(() => { button.textContent = "Copy"; }, 2000);
-    }
+    <h2>Step 4: Configure Hadoop</h2>
+    <p>Set JAVA_HOME in <code>hadoop-env.sh</code>:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo nano hadoop-env.sh
+    </div>
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const steps = document.querySelectorAll(".step");
-        const progressBar = document.getElementById("progress-bar");
+    <p>Find the line with JAVA_HOME and update it to:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+    </div>
 
-        steps.forEach((step, index) => {
-            step.addEventListener("click", () => {
-                const percentage = ((index + 1) / steps.length) * 100;
-                progressBar.style.width = percentage + "%";
-                progressBar.textContent = Math.round(percentage) + "%";
+    <p>Configure <code>core-site.xml</code>:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo nano core-site.xml
+    </div>
 
-                if (percentage === 100) {
-                    progressBar.classList.add("done");
-                    progressBar.textContent = "Installation Complete!";
-                }
+    <p>Add the following configuration:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="xml-tag">&lt;configuration&gt;</span>
+  <span class="xml-tag">&lt;property&gt;</span>
+    <span class="xml-tag">&lt;name&gt;</span>fs.defaultFS<span class="xml-tag">&lt;/name&gt;</span>
+    <span class="xml-tag">&lt;value&gt;</span><span class="xml-value">hdfs://localhost:9000</span><span class="xml-tag">&lt;/value&gt;</span>
+  <span class="xml-tag">&lt;/property&gt;</span>
+  <span class="xml-tag">&lt;property&gt;</span>
+    <span class="xml-tag">&lt;name&gt;</span>hadoop.proxyuser.dataflair.groups<span class="xml-tag">&lt;/name&gt;</span>
+    <span class="xml-tag">&lt;value&gt;</span><span class="xml-value">*</span><span class="xml-tag">&lt;/value&gt;</span>
+  <span class="xml-tag">&lt;/property&gt;</span>
+  <span class="xml-tag">&lt;property&gt;</span>
+    <span class="xml-tag">&lt;name&gt;</span>hadoop.proxyuser.dataflair.hosts<span class="xml-tag">&lt;/name&gt;</span>
+    <span class="xml-tag">&lt;value&gt;</span><span class="xml-value">*</span><span class="xml-tag">&lt;/value&gt;</span>
+  <span class="xml-tag">&lt;/property&gt;</span>
+  <span class="xml-tag">&lt;property&gt;</span>
+    <span class="xml-tag">&lt;name&gt;</span>hadoop.proxyuser.server.hosts<span class="xml-tag">&lt;/name&gt;</span>
+    <span class="xml-tag">&lt;value&gt;</span><span class="xml-value">*</span><span class="xml-tag">&lt;/value&gt;</span>
+  <span class="xml-tag">&lt;/property&gt;</span>
+  <span class="xml-tag">&lt;property&gt;</span>
+    <span class="xml-tag">&lt;name&gt;</span>hadoop.proxyuser.server.groups<span class="xml-tag">&lt;/name&gt;</span>
+    <span class="xml-tag">&lt;value&gt;</span><span class="xml-value">*</span><span class="xml-tag">&lt;/value&gt;</span>
+  <span class="xml-tag">&lt;/property&gt;</span>
+<span class="xml-tag">&lt;/configuration&gt;</span>
+    </div>
+
+    <p>Configure <code>hdfs-site.xml</code>:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo nano hdfs-site.xml
+    </div>
+
+    <p>Add the following configuration:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="xml-tag">&lt;configuration&gt;</span>
+  <span class="xml-tag">&lt;property&gt;</span>
+    <span class="xml-tag">&lt;name&gt;</span>dfs.replication<span class="xml-tag">&lt;/name&gt;</span>
+    <span class="xml-tag">&lt;value&gt;</span><span class="xml-value">1</span><span class="xml-tag">&lt;/value&gt;</span>
+  <span class="xml-tag">&lt;/property&gt;</span>
+<span class="xml-tag">&lt;/configuration&gt;</span>
+    </div>
+
+    <p>Configure <code>mapred-site.xml</code>:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo nano mapred-site.xml
+    </div>
+
+    <p>Add the following configuration:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="xml-tag">&lt;configuration&gt;</span>
+  <span class="xml-tag">&lt;property&gt;</span>
+    <span class="xml-tag">&lt;name&gt;</span>mapreduce.framework.name<span class="xml-tag">&lt;/name&gt;</span>
+    <span class="xml-tag">&lt;value&gt;</span><span class="xml-value">yarn</span><span class="xml-tag">&lt;/value&gt;</span>
+  <span class="xml-tag">&lt;/property&gt;</span>
+  <span class="xml-tag">&lt;property&gt;</span>
+    <span class="xml-tag">&lt;name&gt;</span>mapreduce.application.classpath<span class="xml-tag">&lt;/name&gt;</span>
+    <span class="xml-tag">&lt;value&gt;</span><span class="xml-value">$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*:$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*</span><span class="xml-tag">&lt;/value&gt;</span>
+  <span class="xml-tag">&lt;/property&gt;</span>
+<span class="xml-tag">&lt;/configuration&gt;</span>
+    </div>
+
+    <p>Configure <code>yarn-site.xml</code>:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo nano yarn-site.xml
+    </div>
+
+    <p>Add the following configuration:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="xml-tag">&lt;configuration&gt;</span>
+  <span class="xml-tag">&lt;property&gt;</span>
+    <span class="xml-tag">&lt;name&gt;</span>yarn.nodemanager.aux-services<span class="xml-tag">&lt;/name&gt;</span>
+    <span class="xml-tag">&lt;value&gt;</span><span class="xml-value">mapreduce_shuffle</span><span class="xml-tag">&lt;/value&gt;</span>
+  <span class="xml-tag">&lt;/property&gt;</span>
+  <span class="xml-tag">&lt;property&gt;</span>
+    <span class="xml-tag">&lt;name&gt;</span>yarn.nodemanager.env-whitelist<span class="xml-tag">&lt;/name&gt;</span>
+    <span class="xml-tag">&lt;value&gt;</span><span class="xml-value">JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</span><span class="xml-tag">&lt;/value&gt;</span>
+  <span class="xml-tag">&lt;/property&gt;</span>
+<span class="xml-tag">&lt;/configuration&gt;</span>
+    </div>
+
+    <h2>Step 5: Set Up SSH for Hadoop</h2>
+    <p>Generate SSH keys:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+    </div>
+
+    <p>Authorize the SSH key:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 0600 ~/.ssh/authorized_keys
+    </div>
+
+    <p>Test the SSH connection:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+ssh localhost
+    </div>
+
+    <p>Format the Hadoop File System (run only once):</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+hadoop-3.4.1/bin/hdfs namenode -format
+    </div>
+
+    <h2>Step 6: Start and Test Hadoop</h2>
+    <p>Start Hadoop services:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+start-all.sh
+    </div>
+
+    <p>Access the Hadoop Web Interface at <code>http://localhost:9870</code></p>
+
+    <p>Create directories in HDFS:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+hadoop fs -mkdir /user
+hadoop fs -mkdir /user/your-username
+    </div>
+
+    <p>Upload a file to HDFS:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+touch demo.csv
+hadoop fs -put demo.csv /user/your-username
+    </div>
+
+    <p>Stop Hadoop services when needed:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+stop-all.sh
+    </div>
+
+    <h2>Step 7: WordCount Example</h2>
+    <p>Create a sample text file:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+echo "Hello Hadoop Hello MapReduce" > sample.txt
+    </div>
+
+    <p>Create an input directory in HDFS:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+hadoop fs -mkdir /input
+    </div>
+
+    <p>Upload the sample file to HDFS:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+hadoop fs -put sample.txt /input
+    </div>
+
+    <p>Run the WordCount MapReduce job:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+hadoop jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.1.jar wordcount /input /output
+    </div>
+
+    <p>View the output:</p>
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+hadoop fs -cat /output/part-r-00000
+    </div>
+
+    <p>Expected output:</p>
+    <div class="code-block">
+Hello       2
+Hadoop      1
+MapReduce   1
+    </div>
+
+    <script>
+        // Copy button functionality
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const textToCopy = codeBlock.innerText.replace('Copy', '').trim();
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                button.textContent = 'Failed!';
+                
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
             });
-        });
-    });
-</script>
+        }
 
+        // Progress tracking
+        const progressBar = document.getElementById('progressBar');
+        
+        function updateProgress() {
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            
+            const scrollPercentage = (scrollTop / (documentHeight - windowHeight)) * 100;
+            progressBar.style.width = scrollPercentage + '%';
+        }
+        
+        window.addEventListener('scroll', updateProgress);
+        window.addEventListener('resize', updateProgress);
+        updateProgress(); // Initial call
+    </script>
 </body>
 </html>
