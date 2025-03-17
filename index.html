@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hadoop 3.4.1 Installation Guide</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        pre {
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+        .step {
+            margin-bottom: 20px;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            height: 20px;
+            width: 0%;
+            background-color: #4caf50;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+            border-radius: 5px;
+        }
+        .done {
+            background-color: #28a745 !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Hadoop 3.4.1 Installation Guide (Ubuntu)</h1>
+    
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar">0%</div>
+    </div>
+
+    <div class="step">
+        <h2>Step 1: Install Java JDK 8</h2>
+        <p>Hadoop requires Java to run.</p>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            sudo apt install openjdk-8-jdk
+        </pre>
+    </div>
+
+    <div class="step">
+        <h2>Step 2: Set Up Environment Variables</h2>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            nano ~/.bashrc
+        </pre>
+        <p>Add these lines at the end of the file:</p>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+            export HADOOP_HOME=~/hadoop-3.4.1/
+            export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+        </pre>
+        <p>Then, apply the changes:</p>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            source ~/.bashrc
+        </pre>
+    </div>
+
+    <div class="step">
+        <h2>Step 3: Download and Extract Hadoop</h2>
+        <p>Download Hadoop 3.4.1 from the <a href="https://hadoop.apache.org">official site</a>.</p>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            tar -zxvf ~/Downloads/hadoop-3.4.1.tar.gz
+        </pre>
+    </div>
+
+    <div class="step">
+        <h2>Step 4: Configure Hadoop</h2>
+        <p>Edit `hadoop-env.sh`:</p>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            sudo nano hadoop-3.4.1/etc/hadoop/hadoop-env.sh
+        </pre>
+        <p>Set JAVA_HOME:</p>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+        </pre>
+    </div>
+
+    <div class="step">
+        <h2>Step 5: Set Up SSH</h2>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+        </pre>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+        </pre>
+    </div>
+
+    <div class="step">
+        <h2>Step 6: Start Hadoop</h2>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            start-all.sh
+        </pre>
+    </div>
+
+    <div class="step">
+        <h2>Step 7: Run a WordCount Example</h2>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            hadoop jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.1.jar wordcount /input /output
+        </pre>
+        <p>View the results:</p>
+        <pre>
+            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            hadoop fs -cat /output/part-r-00000
+        </pre>
+    </div>
+
+</div>
+
+<script>
+    function copyCommand(button) {
+        const pre = button.parentElement;
+        const command = pre.textContent.replace("Copy", "").trim();
+        navigator.clipboard.writeText(command);
+        button.textContent = "Copied!";
+        setTimeout(() => { button.textContent = "Copy"; }, 2000);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const steps = document.querySelectorAll(".step");
+        const progressBar = document.getElementById("progress-bar");
+
+        steps.forEach((step, index) => {
+            step.addEventListener("click", () => {
+                const percentage = ((index + 1) / steps.length) * 100;
+                progressBar.style.width = percentage + "%";
+                progressBar.textContent = Math.round(percentage) + "%";
+
+                if (percentage === 100) {
+                    progressBar.classList.add("done");
+                    progressBar.textContent = "Installation Complete!";
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
